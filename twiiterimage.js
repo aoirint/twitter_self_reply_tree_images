@@ -1,0 +1,1 @@
+Array.from(document.querySelectorAll('.css-9pa8cd')).map(e => e.src).filter(s => s.startsWith('https://pbs.twimg.com/media/')).map(s => s.slice(0,s.lastIndexOf('&'))+'&name=4096x4096').map((s,i) => [s,i+'_'+s.slice(s.lastIndexOf('/')+1, s.lastIndexOf('?'))+'.'+new URL(s).searchParams.get('format')]).map(a => a.join(' ')).join('\n')
