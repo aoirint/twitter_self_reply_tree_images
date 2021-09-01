@@ -49,7 +49,7 @@ listAll = function() {
 	const [,username,tweetId] = location.href.match(/twitter\.com\/(.+)\/status\/(.+)$/);
 	let mapping = mediaUrls.map((s, i) => [ mediaIndexes[i], s, mediaIds[i], mediaExts[i] ]);
 	mapping.sort(([i1, s1, d1, e1], [i2, s2, d2, e2]) => i1 - i2); // asc
-    const directory = `twitter/${username}_${tweetId}`
+	const directory = `twitter/${username}_${tweetId}`
 	const result = mapping.map(([_, s, d, e], i) => [s,directory+'/'+tweetId+'_'+zfill(i, 3)+'_'+d+'.'+e]).map(a => a.join(' ')).join('\n');
 	console.log(result);
 }
