@@ -51,8 +51,7 @@ listAll = function() {
 	mapping.sort(([i1, s1, d1, e1], [i2, s2, d2, e2]) => i1 - i2); // asc
 	const directory = `twitter/${username}_${tweetId}`
 	const result = mapping.map(([_, s, d, e], i) => [s,directory+'/'+tweetId+'_'+zfill(i+1, 3)+'_'+d+'.'+e]).map(a => a.join(' ')).join('\n');
-	console.log(directory);
-	console.log(result);
+	console.log(directory + '\n' + result);
 }
 
 setInterval(() => { update(); listAll(); }, 500);
