@@ -1,4 +1,4 @@
-getElementIndex = function(element) {
+getTweetIndex = function(element) {
 	while (element != null && element.tagName != 'ARTICLE') {
 		element = element.parentElement;
 	}
@@ -7,8 +7,17 @@ getElementIndex = function(element) {
 	const transformYValue = transform.slice(transform.lastIndexOf('(')+1, transform.indexOf(')')-2);
 	return parseFloat(transformYValue);
 }
+getImageIndexInTweet = function(element) {
+	while (element != null && element.tagName != 'A') {
+		element = element.parentElement;
+	}
+	if (element == null) return -1;
+	const [,imageIndex] = element.href.match(/photo\/(\d+)$/);
+	return parseInt(imageIndex);
+}
 
-mediaIndexes = [];
+mediaTweetIndexes = [];
+mediaImageIndexes = [];
 mediaUrls = [];
 mediaIds = [];
 mediaExts = [];
@@ -21,23 +30,23 @@ updateImages = function() {
 	const primaryColumn = document.querySelector('div[data-testid="primaryColumn"]');
 	const tweetPhotos = Array.from(primaryColumn.querySelectorAll('div[data-testid="tweetPhoto"] img'));
 	tweetPhotos
-	.map((e) => [ getElementIndex(e), e.src ])
-	// imageElementIndex, imageSrc
-	.filter(([i, s]) => s.startsWith('https://pbs.twimg.com/media/'))
-	.map(([i, s]) => [ i, s.slice(0,s.lastIndexOf('&'))+'&name=4096x4096', s.slice(s.lastIndexOf('/')+1, s.lastIndexOf('?')), new URL(s).searchParams.get('format') ])
-	// imageElementIndex, imageSrc, imageId, imageExtension
-	.filter(([i, s, d, e]) => ! mediaUrls.includes(s))
-	.forEach(([i, s, d, e]) => { mediaIndexes.push(i); mediaUrls.push(s); mediaIds.push(d); mediaExts.push(e); });
+	.map((e) => [ getTweetIndex(e), getImageIndexInTweet(e), e.src ])
+	// tweetIndex, imageIndex, imageSrc
+	.filter(([ti, ii, s]) => s.startsWith('https://pbs.twimg.com/media/'))
+	.map(([ti, ii, s]) => [ ti, ii, s.slice(0,s.lastIndexOf('&'))+'&name=4096x4096', s.slice(s.lastIndexOf('/')+1, s.lastIndexOf('?')), new URL(s).searchParams.get('format') ])
+	// tweetIndex, imageIndex, imageSrc, imageId, imageExtension
+	.filter(([ti, ii, s, d, e]) => ! mediaUrls.includes(s))
+	.forEach(([ti, ii, s, d, e]) => { mediaTweetIndexes.push(ti); mediaImageIndexes.push(ii); mediaUrls.push(s); mediaIds.push(d); mediaExts.push(e); });
 }
 updateGifVideos = function() {
 	const primaryColumn = document.querySelector('div[data-testid="primaryColumn"]');
 	const tweetGifVideos = Array.from(primaryColumn.querySelectorAll('div[data-testid="placementTracking"] video'));
 	tweetGifVideos
-	.map((e) => [ getElementIndex(e), e.src ])
-	.filter(([i, s]) => s.startsWith('https://video.twimg.com/'))
-	.map(([i, s]) => [ i, s, s.slice(s.lastIndexOf('/')+1, s.lastIndexOf('.')), s.substr(s.lastIndexOf('.')+1) ])
-	.filter(([i, s, d, e]) => ! mediaUrls.includes(s))
-	.forEach(([i, s, d, e]) => { mediaIndexes.push(i); mediaUrls.push(s); mediaIds.push(d); mediaExts.push(e); });
+	.map((e) => [ getTweetIndex(e), getImageIndexInTweet(e), e.src ])
+	.filter(([ti, ii, s]) => s.startsWith('https://video.twimg.com/'))
+	.map(([ti, ii, s]) => [ ti, ii, s, s.slice(s.lastIndexOf('/')+1, s.lastIndexOf('.')), s.substr(s.lastIndexOf('.')+1) ])
+	.filter(([ti, ii, s, d, e]) => ! mediaUrls.includes(s))
+	.forEach(([ti, ii, s, d, e]) => { mediaTweetIndexes.push(ti); mediaImageIndexes.push(ii); mediaUrls.push(s); mediaIds.push(d); mediaExts.push(e); });
 }
 
 zfill = function(num, digits) {
@@ -47,10 +56,14 @@ zfill = function(num, digits) {
 
 listAll = function() {
 	const [,username,tweetId] = location.href.match(/twitter\.com\/(.+)\/status\/(.+)$/);
-	let mapping = mediaUrls.map((s, i) => [ mediaIndexes[i], s, mediaIds[i], mediaExts[i] ]);
-	mapping.sort(([i1, s1, d1, e1], [i2, s2, d2, e2]) => i1 - i2); // asc
+	let mapping = mediaUrls.map((s, i) => [ mediaTweetIndexes[i], mediaImageIndexes[i], s, mediaIds[i], mediaExts[i] ]);
+	mapping.sort(([ii1, ti1, s1, d1, e1], [ii2, ti2, s2, d2, e2]) => {
+        const c1 = ii1 - ii2;
+        if (c1 !== 0) return c1;
+        return ti1 - ti2;
+    }); // asc
 	const directory = `twitter/${username}_${tweetId}`
-	const result = mapping.map(([_, s, d, e], i) => [s,directory+'/'+tweetId+'_'+zfill(i+1, 3)+'_'+d+'.'+e]).map(a => a.join(' ')).join('\n');
+	const result = mapping.map(([_, __, s, d, e], i) => [s,directory+'/'+tweetId+'_'+zfill(i, 3)+'_'+d+'.'+e]).map(a => a.join(' ')).join('\n');
 	console.log(directory + '\n' + result);
 }
 
