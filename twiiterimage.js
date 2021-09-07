@@ -57,19 +57,21 @@ zfill = function(num, digits) {
 }
 
 listAll = function() {
-    let username, tweetId;
+    let username, identifier;
 
 	const statusMatch = location.href.match(/twitter\.com\/(.+)\/status\/(.+)$/);
 	const momentMatch = location.href.match(/twitter\.com\/i\/events\/(.+)$/);
 
     if (statusMatch) {
-        [,username,tweetId] = statusMatch;
+        const [,_username,tweetId] = statusMatch;
+        username = _username;
+        identifier = `${username}_status_${tweetId}`;
     }
     if (momentMatch) {
         const [,momentId] = momentMatch;
         const usernameElement = document.querySelector('#react-root > div > div > div.css-1dbjc4n.r-18u37iz.r-13qz1uu.r-417010 > main > div > div > div > div.css-1dbjc4n.r-yfoy6g.r-18bvks7.r-1ljd8xs.r-13l2t4g.r-1phboty.r-1jgb5lz.r-11wrixw.r-61z16t.r-1ye8kvj.r-13qz1uu.r-184en5c > div > div.css-1dbjc4n.r-ymttw5.r-1f1sjgu > div:nth-child(1) > div.css-1dbjc4n.r-1wbh5a2.r-dnmrzs > a > div > div.css-1dbjc4n.r-18u37iz.r-1wbh5a2.r-13hce6t > div > span')
         username = usernameElement.innerText.substr(1)
-        tweetId = `events_${momentId}`
+        identifier = `${username}_events_${momentId}`
     }
 
 	let mapping = mediaUrls.map((s, i) => [ mediaTweetIndexes[i], mediaImageIndexes[i], s, mediaIds[i], mediaExts[i] ]);
@@ -78,8 +80,8 @@ listAll = function() {
         if (c1 !== 0) return c1;
         return ti1 - ti2;
     }); // asc
-	const directory = `twitter/${username}_${tweetId}`
-	const result = mapping.map(([_, __, s, d, e], i) => [s,directory+'/'+tweetId+'_'+zfill(i, 3)+'_'+d+'.'+e]).map(a => a.join(' ')).join('\n');
+	const directory = `twitter/${identifier}`
+	const result = mapping.map(([_, __, s, d, e], i) => [s,directory+'/'+identifier+'_'+zfill(i, 3)+'_'+d+'.'+e]).map(a => a.join(' ')).join('\n');
 	console.log(directory + '\n' + result);
 }
 
