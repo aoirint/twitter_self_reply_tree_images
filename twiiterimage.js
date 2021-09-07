@@ -1,3 +1,5 @@
+flagReverseTweetOrder = false;
+
 getTweetIndex = function(element) {
 	while (element != null && element.tagName != 'ARTICLE') {
 		element = element.parentElement;
@@ -55,10 +57,24 @@ zfill = function(num, digits) {
 }
 
 listAll = function() {
-	const [,username,tweetId] = location.href.match(/twitter\.com\/(.+)\/status\/(.+)$/);
+    let username, tweetId;
+
+	const statusMatch = location.href.match(/twitter\.com\/(.+)\/status\/(.+)$/);
+	const momentMatch = location.href.match(/twitter\.com\/i\/events\/(.+)$/);
+
+    if (statusMatch) {
+        [,username,tweetId] = statusMatch;
+    }
+    if (momentMatch) {
+        const [,momentId] = momentMatch;
+        const usernameElement = document.querySelector('#react-root > div > div > div.css-1dbjc4n.r-18u37iz.r-13qz1uu.r-417010 > main > div > div > div > div.css-1dbjc4n.r-yfoy6g.r-18bvks7.r-1ljd8xs.r-13l2t4g.r-1phboty.r-1jgb5lz.r-11wrixw.r-61z16t.r-1ye8kvj.r-13qz1uu.r-184en5c > div > div.css-1dbjc4n.r-ymttw5.r-1f1sjgu > div:nth-child(1) > div.css-1dbjc4n.r-1wbh5a2.r-dnmrzs > a > div > div.css-1dbjc4n.r-18u37iz.r-1wbh5a2.r-13hce6t > div > span')
+        username = usernameElement.innerText.substr(1)
+        tweetId = `events_${momentId}`
+    }
+
 	let mapping = mediaUrls.map((s, i) => [ mediaTweetIndexes[i], mediaImageIndexes[i], s, mediaIds[i], mediaExts[i] ]);
 	mapping.sort(([ii1, ti1, s1, d1, e1], [ii2, ti2, s2, d2, e2]) => {
-        const c1 = ii1 - ii2;
+        const c1 = (ii1 - ii2) * (flagReverseTweetOrder ? -1 : 1);
         if (c1 !== 0) return c1;
         return ti1 - ti2;
     }); // asc
