@@ -12,6 +12,11 @@ URL1 filename1
 URL2 filename2
 ```
 
-以下の`wgetf`でこのファイルを入力としてダウンロードできる。
+以下の`wgetf`で2行目以降のフォーマットを入力としてダウンロードできる。
 
 - https://github.com/aoirint/scripts/blob/main/wgetf/wgetf
+
+```shell
+tee | wgetf /dev/stdin
+```
+
