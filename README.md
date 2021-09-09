@@ -8,8 +8,8 @@
 
 ```
 twitter/username_status_tweetid
-URL1 filename1
-URL2 filename2
+URL1 twitter/username_status_tweetid/tweetid_index_imageid.ext
+URL2 twitter/username_status_tweetid/tweetid_index_imageid.ext
 ```
 
 以下の`wgetf`で2行目以降のフォーマットを入力としてダウンロードできる。
