@@ -17,6 +17,7 @@ URL2 twitter/username_status_tweetid/tweetid_002_imageid.ext
 - https://github.com/aoirint/scripts/blob/main/wgetf/wgetf
 
 ```shell
+mkdir -p twitter/username_status_tweetid
 tee | wgetf /dev/stdin
 ```
 
