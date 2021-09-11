@@ -18,6 +18,8 @@ URL2 twitter/username_status_tweetid/tweetid_002_imageid.ext
 
 ```shell
 mkdir -p twitter/username_status_tweetid
-tee | wgetf /dev/stdin
+tee | wgetf /dev/stdin 0
 ```
+
+Ctrl+Dで入力終了。
 
